@@ -59,11 +59,13 @@ customer-support-bot/
 - Don't hardcode secrets/API keys in code — use environment variables (.env file)
 
 ## Current Status
-All core features (1-4) plus a stretch goal are done: Express server
+All core features (1-4) plus stretch goals are done: Express server
 (`server.js`) serves the static chat widget (`public/`), `/api/chat` calls
-the real Claude API, and Claude has two tools — `lookup_order` (fake orders
-in `data/orders.json`) and `get_store_info` (business hours / return policy
-in `data/storeInfo.json`). The chat widget also remembers earlier messages
-within a browser session (history is kept client-side and sent with each
-request, since the server is a stateless serverless function on Vercel).
-Deployed on Vercel with auto-deploy from GitHub.
+the real Claude API, and Claude has three tools — `lookup_order` (fake
+orders in `data/orders.json`), `get_store_info` (business hours / return
+policy in `data/storeInfo.json`), and `start_return` (captures which order
+and why the customer wants to return it, returns a fake confirmation —
+nothing is actually persisted). The chat widget also remembers earlier
+messages within a browser session (history is kept client-side and sent
+with each request, since the server is a stateless serverless function on
+Vercel). Deployed on Vercel with auto-deploy from GitHub.

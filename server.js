@@ -40,6 +40,9 @@ Widget Co, a small online store that sells (fictional) widgets and gadgets.
   have one yet.
 - If someone asks about business hours or the return policy, use the
   get_store_info tool rather than guessing.
+- If someone wants to return an order, find out which order it is (order ID
+  or customer name) and ask why they're returning it, then use the
+  start_return tool. Don't guess a reason on their behalf.
 - If you don't know something specific about Widget Co, say so honestly
   instead of making it up.`;
 
@@ -85,24 +88,83 @@ const tools = [
       required: ["topic"],
     },
   },
+  {
+    name: "start_return",
+    description:
+      "Start a return for a Widget Co order. Requires the order (ID or " +
+      "customer name) and a reason for the return. Call this once you know " +
+      "which order the customer wants to return and why — don't guess the reason.",
+    input_schema: {
+      type: "object",
+      properties: {
+        orderId: {
+          type: "string",
+          description: "The order ID, e.g. 'WC-1001'.",
+        },
+        customerName: {
+          type: "string",
+          description: "The customer's name the order was placed under.",
+        },
+        reason: {
+          type: "string",
+          enum: ["defective_or_damaged", "wrong_item", "no_longer_needed", "doesnt_fit", "other"],
+          description: "The customer's reason for returning the item.",
+        },
+        reasonDetails: {
+          type: "string",
+          description: "Any extra detail the customer gave about the reason, especially if reason is 'other'.",
+        },
+      },
+      required: ["reason"],
+    },
+  },
 ];
 
-// This is the actual function that runs when Claude calls the lookup_order
-// tool. It just searches our fake in-memory order list — in a real app this
-// might be a database query instead.
-function lookupOrder({ orderId, customerName }) {
-  const match = orders.find((order) => {
+// Shared by lookup_order and start_return — finds an order by ID or by a
+// (partial, case-insensitive) match on the customer name.
+function findOrder({ orderId, customerName }) {
+  return orders.find((order) => {
     const idMatches = orderId && order.orderId.toLowerCase() === orderId.trim().toLowerCase();
     const nameMatches =
       customerName && order.customerName.toLowerCase().includes(customerName.trim().toLowerCase());
     return idMatches || nameMatches;
   });
+}
+
+// This is the actual function that runs when Claude calls the lookup_order
+// tool. It just searches our fake in-memory order list — in a real app this
+// might be a database query instead.
+function lookupOrder({ orderId, customerName }) {
+  const match = findOrder({ orderId, customerName });
 
   if (!match) {
     return { found: false, message: "No matching order was found." };
   }
 
   return { found: true, order: match };
+}
+
+// Runs when Claude calls the start_return tool. Since this is a learning
+// project with no real database, we don't actually persist the return
+// anywhere — we just confirm the order exists and hand back a fake
+// confirmation (including the reason) for Claude to relay to the customer.
+function startReturn({ orderId, customerName, reason, reasonDetails }) {
+  const match = findOrder({ orderId, customerName });
+
+  if (!match) {
+    return { started: false, message: "No matching order was found, so the return could not be started." };
+  }
+
+  // A fake return ID, just so the reply feels concrete — e.g. "WC-1001" -> "RET-1001".
+  const returnId = `RET-${match.orderId.split("-").pop()}`;
+
+  return {
+    started: true,
+    returnId,
+    order: match,
+    reason,
+    reasonDetails: reasonDetails || null,
+  };
 }
 
 // Runs when Claude calls the get_store_info tool — just returns the
@@ -184,6 +246,8 @@ app.post("/api/chat", async (req, res) => {
           result = lookupOrder(toolUse.input);
         } else if (toolUse.name === "get_store_info") {
           result = getStoreInfo(toolUse.input);
+        } else if (toolUse.name === "start_return") {
+          result = startReturn(toolUse.input);
         } else {
           result = { error: `Unknown tool: ${toolUse.name}` };
         }
