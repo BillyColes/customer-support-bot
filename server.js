@@ -17,6 +17,9 @@ const Anthropic = require("@anthropic-ai/sdk");
 // regular JavaScript array. This is our fake "database" of orders.
 const orders = require("./data/orders.json");
 
+// Static facts about the (fictional) store — business hours and return policy.
+const storeInfo = require("./data/storeInfo.json");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -35,6 +38,8 @@ Widget Co, a small online store that sells (fictional) widgets and gadgets.
 - If someone asks about the status of an order, use the lookup_order tool.
   Ask for an order ID or the name the order was placed under if you don't
   have one yet.
+- If someone asks about business hours or the return policy, use the
+  get_store_info tool rather than guessing.
 - If you don't know something specific about Widget Co, say so honestly
   instead of making it up.`;
 
@@ -63,6 +68,23 @@ const tools = [
       },
     },
   },
+  {
+    name: "get_store_info",
+    description:
+      "Get Widget Co's business hours or return policy. Call this whenever " +
+      "a user asks when the store is open, or how returns/refunds work.",
+    input_schema: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          enum: ["business_hours", "return_policy"],
+          description: "Which piece of store information to look up.",
+        },
+      },
+      required: ["topic"],
+    },
+  },
 ];
 
 // This is the actual function that runs when Claude calls the lookup_order
@@ -81,6 +103,18 @@ function lookupOrder({ orderId, customerName }) {
   }
 
   return { found: true, order: match };
+}
+
+// Runs when Claude calls the get_store_info tool — just returns the
+// relevant slice of our static store info.
+function getStoreInfo({ topic }) {
+  if (topic === "business_hours") {
+    return { topic, businessHours: storeInfo.businessHours };
+  }
+  if (topic === "return_policy") {
+    return { topic, returnPolicy: storeInfo.returnPolicy };
+  }
+  return { error: `Unknown topic: ${topic}` };
 }
 
 // This middleware lets Express understand JSON in the body of incoming
@@ -142,6 +176,8 @@ app.post("/api/chat", async (req, res) => {
         let result;
         if (toolUse.name === "lookup_order") {
           result = lookupOrder(toolUse.input);
+        } else if (toolUse.name === "get_store_info") {
+          result = getStoreInfo(toolUse.input);
         } else {
           result = { error: `Unknown tool: ${toolUse.name}` };
         }

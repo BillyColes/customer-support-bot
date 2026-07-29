@@ -1,0 +1,14 @@
+{
+  "businessHours": {
+    "mondayToFriday": "9:00 AM - 6:00 PM",
+    "saturday": "10:00 AM - 4:00 PM",
+    "sunday": "Closed",
+    "timezone": "Eastern Time (ET)"
+  },
+  "returnPolicy": {
+    "windowDays": 30,
+    "condition": "Items must be unused, in their original packaging, with proof of purchase.",
+    "refundMethod": "Refunded to the original payment method within 5-7 business days after we receive the returned item.",
+    "howToStart": "Email support@widgetco.example with your order ID to start a return."
+  }
+}
