@@ -1,0 +1,42 @@
+[
+  {
+    "orderId": "WC-1001",
+    "customerName": "Jane Pebblestone",
+    "item": "Widget Deluxe",
+    "status": "Shipped",
+    "orderDate": "2026-07-10",
+    "estimatedDelivery": "2026-07-18"
+  },
+  {
+    "orderId": "WC-1002",
+    "customerName": "Marcus Fennwick",
+    "item": "Gadget Mini",
+    "status": "Processing",
+    "orderDate": "2026-07-22",
+    "estimatedDelivery": "2026-07-30"
+  },
+  {
+    "orderId": "WC-1003",
+    "customerName": "Priya Alderfen",
+    "item": "Widget Deluxe + Carry Case",
+    "status": "Out for Delivery",
+    "orderDate": "2026-07-15",
+    "estimatedDelivery": "2026-07-29"
+  },
+  {
+    "orderId": "WC-1004",
+    "customerName": "Devon Rooksby",
+    "item": "Gadget Pro",
+    "status": "Delivered",
+    "orderDate": "2026-07-01",
+    "estimatedDelivery": "2026-07-08"
+  },
+  {
+    "orderId": "WC-1005",
+    "customerName": "Lena Ashcombe",
+    "item": "Widget Mini",
+    "status": "Cancelled",
+    "orderDate": "2026-07-05",
+    "estimatedDelivery": null
+  }
+]

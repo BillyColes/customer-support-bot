@@ -59,7 +59,8 @@ customer-support-bot/
 - Don't hardcode secrets/API keys in code — use environment variables (.env file)
 
 ## Current Status
-Step 1-2 done: Express server (`server.js`) serves the static chat widget
-(`public/`) and a `/api/chat` endpoint that currently just echoes the
-message back. Next step: connect `/api/chat` to the real Claude API
-(step 3), then add order lookup (step 4).
+Steps 1-4 done: Express server (`server.js`) serves the static chat widget
+(`public/`), `/api/chat` calls the real Claude API, and Claude can look up
+orders from `data/orders.json` via a `lookup_order` tool. Deployed on Vercel
+with auto-deploy from GitHub. Next step (stretch goal): additional support
+tools, e.g. return policy lookup, business hours.
