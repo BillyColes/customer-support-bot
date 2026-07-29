@@ -63,4 +63,7 @@ All core features (1-4) plus a stretch goal are done: Express server
 (`server.js`) serves the static chat widget (`public/`), `/api/chat` calls
 the real Claude API, and Claude has two tools — `lookup_order` (fake orders
 in `data/orders.json`) and `get_store_info` (business hours / return policy
-in `data/storeInfo.json`). Deployed on Vercel with auto-deploy from GitHub.
+in `data/storeInfo.json`). The chat widget also remembers earlier messages
+within a browser session (history is kept client-side and sent with each
+request, since the server is a stateless serverless function on Vercel).
+Deployed on Vercel with auto-deploy from GitHub.

@@ -135,10 +135,16 @@ app.post("/api/chat", async (req, res) => {
     return res.status(400).json({ error: "Missing 'message' in request body." });
   }
 
+  // The browser sends along the prior conversation so Claude has context
+  // from earlier messages. We trust it's an array of { role, content }
+  // objects, but fall back to an empty conversation if it's missing or malformed.
+  const history = Array.isArray(req.body.history) ? req.body.history : [];
+
   try {
-    // The conversation Claude sees for this request. We'll add to this as
-    // we go if Claude decides to use a tool.
-    const messages = [{ role: "user", content: userMessage }];
+    // The conversation Claude sees for this request: everything said so
+    // far, plus the new message. We'll add to this further if Claude
+    // decides to use a tool.
+    const messages = [...history, { role: "user", content: userMessage }];
 
     // Claude can only run ONE step at a time — either it replies with text,
     // or it asks to use a tool. When it uses a tool, we have to run the
